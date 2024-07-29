@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      ul {
+        list-style: none;
+        margin: 16;
+        padding: 0;
+        display: flex;
+        gap: 8px;
+        font-size: 32px;
+      }
+      li {
+        border: 1px solid black;
+        border-radius: 4px;
+        width: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .used {
+        border-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <label>
+        Enter input string
+        <input type="text" pattern="[AB]*" />
+      </label>
+      <button>Generate</button>
+    </div>
+    <ul></ul>
+    <script>
+      const input = document.querySelector("input");
+      const button = document.querySelector("button");
+      const list = document.querySelector("ul");
+
+      let arr = [];
+
+      function render() {
+        let html = arr
+          .map(
+            ({ index, char, used }) => `
+            <li data-index="${index}" class="${used ? "used" : ""}">
+              <div>${index}</div>
+              <div>${char}</div>
+            </li>
+          `
+          )
+          .join("");
+
+        list.innerHTML = html;
+
+        const items = list.querySelectorAll("li");
+
+        items.forEach((item) =>
+          item.addEventListener("click", () => {
+            const index = +item.dataset.index;
+
+            if (index === arr.length - 1) return;
+
+            const clicked = arr[index];
+            const neighbor = arr[index + 1];
+
+            if (
+              !clicked.used &&
+              clicked.char === "A" &&
+              neighbor.char === "B"
+            ) {
+              clicked.char = "B";
+              clicked.used = true;
+              neighbor.char = "A";
+
+              render();
+            }
+          })
+        );
+      }
+
+      button.addEventListener("click", () => {
+        const string = input.value.toLocaleUpperCase().replace(/[^AB]/g, "");
+
+        input.value = string;
+
+        arr = [];
+
+        for (let i = 0; i < string.length; ++i) {
+          arr.push({
+            index: i,
+            char: string[i],
+            used: false,
+          });
+        }
+
+        render();
+      });
+    </script>
+  </body>
+</html>
